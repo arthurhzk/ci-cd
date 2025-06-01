@@ -1,22 +1,37 @@
 name: CI
+
 on:
   push:
     branches: [main]
+
 jobs:
   build:
     name: Build and Push
     runs-on: ubuntu-latest
+    
     steps:
       - uses: actions/checkout@v4
+      
       - name: Setup node
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'yarn'
+      
       - name: Install dependencies
         run: yarn
+      
       - name: Run tests
         run: yarn test
-      - name: Build and Push Docker Image
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Generate tag
+        id: generate_tag
         run: |
-          docker build -t rocketseat-ci:latest .
+          SHA=$(echo $GITHUB_SHA | cut -c1-7)
+          echo "SHA=$SHA" >> $GITHUB_OUTPUT
+      
+      - name: Build Docker Image
+        run: docker build -t rocketseat-api-ci:${{ steps.generate_tag.outputs.SHA }} .
