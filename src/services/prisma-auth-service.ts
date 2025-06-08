@@ -2,13 +2,22 @@ import { hash, compare } from "bcryptjs";
 import prisma from "../infra/prisma.ts";
 import createError from "@fastify/error";
 import { StatusCodes } from "http-status-codes";
-const UserExists = createError("USER_EXISTS", "User already exists", 409);
+import { dispatchOrderCreated } from "../broker/messages/send-register-notification.ts";
+const UserExists = createError(
+  "USER_EXISTS",
+  "User already exists",
+  StatusCodes.CONFLICT
+);
 const PasswordMismatch = createError(
   "PASSWORD_MISMATCH",
   "Passwords do not match",
   StatusCodes.BAD_REQUEST
 );
-const UserNotFound = createError("USER_NOT_FOUND", "User not found", 404);
+const UserNotFound = createError(
+  "USER_NOT_FOUND",
+  "User not found",
+  StatusCodes.NOT_FOUND
+);
 const InvalidCredentials = createError(
   "INVALID_CREDENTIALS",
   "Invalid credentials",
@@ -35,6 +44,8 @@ export class PrismaAuthService {
         passwordHash: await hash(password, this.SALT),
       },
     });
+
+    dispatchOrderCreated({ email, name });
 
     return !!user;
   }
