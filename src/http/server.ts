@@ -1,7 +1,7 @@
 import Fastify from "fastify";
 import type { FastifyReply, FastifyRequest } from "fastify";
 import { fastifyCors } from "@fastify/cors";
-import { AuthController } from "../controllers/auth.ts";
+import "../broker/subscriber.ts";
 
 import {
   serializerCompiler,
@@ -20,9 +20,6 @@ app.get("/health", (req: FastifyRequest, reply: FastifyReply) => {
   return reply.send({ status: "OK" });
 });
 
-app.post("/register", AuthController.prototype.register);
-app.post("/login", AuthController.prototype.login);
-
-app.listen({ host: "0.0.0.0", port: 3334 }).then(() => {
-  console.log("[Authentication] HTTP Server running!");
+app.listen({ host: "0.0.0.0", port: 3380 }).then(() => {
+  console.log("[Notification] HTTP Server running!");
 });

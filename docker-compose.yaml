@@ -1,11 +1,14 @@
 services:
-  authentication-pg:
-    image: bitnami/postgresql:latest
+  notification-mongo:
+    image: mongo:latest
     ports:
-      - "5483:5432"
+      - "27017:27017"
     environment:
-      - POSTGRES_USER=docker
-      - POSTGRES_PASSWORD=docker
-      - POSTGRES_DB=invoices
+      - MONGO_INITDB_ROOT_USERNAME=docker
+      - MONGO_INITDB_ROOT_PASSWORD=docker
+      - MONGO_INITDB_DATABASE=notifications
     volumes:
-      - ./docker:/docker-entrypoint-initdb.d
+      - mongodb_data:/data/db
+
+volumes:
+  mongodb_data:
